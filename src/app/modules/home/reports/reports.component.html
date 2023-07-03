@@ -1,0 +1,622 @@
+<!-- main content -->
+<section class="section">
+  <div class="card">
+    <div class="card-body">
+      <div class="card-text pt-3">
+        <!-- main content table -->
+        <!-- search -->
+        <div class="search mb-2">
+          <!-- search panel -->
+          <p-panel
+            class="search__panel"
+            header="جستجو"
+            iconPos="start"
+            [toggleable]="true"
+            [collapsed]="true">
+            <form
+              #formDir="ngForm"
+              [formGroup]="searchReportForm"
+              (ngSubmit)="getReportList()">
+              <!-- فیلترها -->
+              <div class="row row-cols-lg-2 row-cols-1 pb-2">
+                <!-- عمومی -->
+                <p-panel
+                  #generalPanel
+                  class="search-panel__secation pb-1"
+                  header="عمومی">
+                  <!-- نام شرکت -->
+                  <label for="companyModel">نام شرکت</label>
+                  <p-dropdown
+                    id="companyModel"
+                    name="companyModel"
+                    formControlName="companyModel"
+                    class="col"
+                    styleClass="w-100 my-1"
+                    optionLabel="companyName"
+                    filterBy="companyName"
+                    [filter]="true"
+                    [options]="companies"
+                    placeholder="انتخاب کنید"
+                    (onChange)="getReportList()"
+                    [showClear]="true">
+                  </p-dropdown>
+                  <!-- / نام شرکت -->
+
+                  <!-- وضعیت ناشر -->
+                  <div class="col">
+                    <label for="publisherStatus">وضعیت ناشر</label>
+                    <p-dropdown
+                      #publisherStatus
+                      id="publisherStatus"
+                      name="publisherStatus"
+                      formControlName="publisherStatus"
+                      styleClass="w-100 my-1"
+                      optionLabel="title"
+                      filterBy="title"
+                      [filter]="true"
+                      placeholder="انتخاب کنید"
+                      [options]="publisherStatuses"
+                      [showClear]="true">
+                    </p-dropdown>
+                  </div>
+                  <!-- / وضعیت ناشر -->
+
+                  <!-- گروه اطلاعیه -->
+                  <div class="col">
+                    <label for="advertisementGroupModel">گروه اطلاعیه</label>
+                    <p-dropdown
+                      id="advertisementGroupModel"
+                      name="advertisementGroupModel"
+                      formControlName="advertisementGroupModel"
+                      styleClass="w-100 my-1"
+                      optionLabel="title"
+                      filterBy="title"
+                      [filter]="true"
+                      placeholder="انتخاب کنید"
+                      [options]="advertisementGroup"
+                      (onChange)="onChangeAdverGroup()"
+                      [showClear]="true">
+                    </p-dropdown>
+                  </div>
+                  <!-- / گروه اطلاعیه -->
+
+                  <!-- نوع  شرکت -->
+                  <div class="col">
+                    <label for="companyType">نوع شرکت</label>
+                    <p-dropdown
+                      id="companyType"
+                      name="companyType"
+                      formControlName="companyType"
+                      styleClass="w-100 my-1"
+                      optionLabel="title"
+                      filterBy="title"
+                      [filter]="true"
+                      placeholder="انتخاب کنید"
+                      [options]="companyTypes"
+                      [showClear]="true">
+                    </p-dropdown>
+                  </div>
+                  <!-- / نوع  شرکت -->
+
+                  <!-- نوع اطلاعیه -->
+                  <div class="col">
+                    <label for="advertisementType">نوع اطلاعیه</label>
+                    <p-dropdown
+                      id="advertisementType"
+                      name="advertisementType"
+                      formControlName="advertisementType"
+                      styleClass="w-100 my-1"
+                      optionLabel="title"
+                      filterBy="title"
+                      [filter]="true"
+                      placeholder="انتخاب کنید"
+                      [options]="advertisementTypes"
+                      [showClear]="true">
+                    </p-dropdown>
+                  </div>
+                  <!-- / نوع اطلاعیه -->
+
+                  <!-- موسسه حسابرسی شرکت -->
+                  <div class="col">
+                    <label for="companyInspectionInstituteModel"
+                      >موسسه حسابرسی شرکت</label
+                    >
+                    <p-dropdown
+                      id="companyInspectionInstituteModel"
+                      name="companyInspectionInstituteModel"
+                      formControlName="companyInspectionInstituteModel"
+                      styleClass="w-100 my-1"
+                      optionLabel="title"
+                      placeholder="موسسه حسابرسی شرکت"
+                      filterBy="title"
+                      [filter]="true"
+                      placeholder="انتخاب کنید"
+                      [options]="companyInspectionInstitutes"
+                      [showClear]="true">
+                    </p-dropdown>
+                  </div>
+                  <!-- / موسسه حسابرسی شرکت -->
+
+                  <!-- طول  دوره -->
+                  <div class="col">
+                    <label for="courseLength">طول دوره</label>
+                    <p-dropdown
+                      id="courseLength"
+                      name="courseLength"
+                      formControlName="courseLength"
+                      styleClass="w-100 mt-1"
+                      optionLabel="title"
+                      placeholder="انتخاب کنید"
+                      [options]="courseLengths"
+                      [showClear]="true">
+                    </p-dropdown>
+                  </div>
+                  <!-- / طول  دوره -->
+
+                  <!-- شماره پیگیری -->
+                  <div class="col mt-2">
+                    <label for="issueTrackingNo">شماره پیگیری</label>
+                    <input
+                      pInputText
+                      id="issueTrackingNo"
+                      name="issueTrackingNo"
+                      formControlName="issueTrackingNo"
+                      type="text"
+                      class="w-100"
+                      [value]="issueTrackingNo?.value | faNum" />
+                  </div>
+                  <!-- / شماره پیگیری -->
+                </p-panel>
+                <!-- / عمومی -->
+
+                <!-- اختصاصی -->
+                <p-panel class="search-panel__secation pb-1" header="اختصاصی">
+                  <div class="row row-cols-lg-1 row-cols-1">
+                    <!-- موضوع اطلاعیه -->
+                    <div class="col my-1">
+                      <label for="description">موضوع اطلاعیه</label>
+                      <input
+                        pInputText
+                        id="description"
+                        name="description"
+                        formControlName="description"
+                        type="text"
+                        class="w-100" />
+                    </div>
+                    <!-- / موضوع اطلاعیه -->
+                    <!-- کد اطلاعیه -->
+                    <div class="col my-1">
+                      <label for="code">کد اطلاعیه</label>
+                      <input
+                        pInputText
+                        id="code"
+                        name="code"
+                        formControlName="code"
+                        type="text"
+                        class="w-100"
+                        [value]="code?.value | faNum" />
+                    </div>
+                    <!-- / کد اطلاعیه -->
+                  </div>
+
+                  <!-- <div class="row row-cols-lg-2 row-cols-1 my-2"> -->
+                  <!-- شماره پیگیری -->
+                  <!-- <div class="col my-1 text-center">
+                      <input
+                        pInputText
+                        id="issueTrackingNo"
+                        name="issueTrackingNo"
+                        formControlName="issueTrackingNo"
+                        type="text"
+                        class="w-100"
+                        placeholder="شماره پیگیری" />
+                    </div> -->
+                  <!-- / شماره پیگیری -->
+
+                  <!-- سال مالی منتهی به -->
+                  <!-- <div class="col my-1 text-center">
+                    <p-persian-calendar
+                      id="issueTrackingNo"
+                      name="issueTrackingNo"
+                      formControlName="issueTrackingNo"
+                      styleClass="w-100 "
+                      placeholder="سال مالی منتهی به"
+                      view="year"
+                      dateFormat="yy">
+                    </p-persian-calendar>
+                  </div> -->
+                  <!-- / سال مالی منتهی به -->
+                  <!-- </div> -->
+
+                  <div class="row row-cols-lg-2 row-cols-1">
+                    <!-- از تاریخ -->
+                    <div class="col my-1">
+                      <label for="fromPublishDate">از تاریخ</label>
+                      <p-persian-calendar
+                        id="fromPublishDate"
+                        name="fromPublishDate"
+                        formControlName="fromPublishDate"
+                        styleClass="w-100 ">
+                      </p-persian-calendar>
+                    </div>
+                    <!-- / از تاریخ -->
+
+                    <!-- تا تاریخ -->
+                    <div class="col my-1">
+                      <label for="toPublishDate">تا تاریخ</label>
+                      <p-persian-calendar
+                        id="toPublishDate"
+                        name="toPublishDate"
+                        formControlName="toPublishDate"
+                        styleClass="w-100 ">
+                      </p-persian-calendar>
+                    </div>
+                    <!-- / تا تاریخ -->
+                  </div>
+
+                  <div class="row row-cols-lg-2 row-cols-1 mt-4">
+                    <!-- حسابرسی شده -->
+                    <div
+                      class="col d-flex justify-content-start align-items-center">
+                      <p-inputSwitch
+                        id="isAudited"
+                        name="isAudited"
+                        formControlName="isAudited"></p-inputSwitch>
+                      <label for="hasAudit" class="px-2">
+                        <strong> حسابرسی شده </strong>
+                      </label>
+                    </div>
+                    <!-- / حسابرسی شده -->
+
+                    <!-- حسابرسی نشده -->
+                    <div
+                      class="col d-flex justify-content-start align-items-center">
+                      <p-inputSwitch
+                        id="isNotAudited"
+                        name="isNotAudited"
+                        formControlName="isNotAudited"></p-inputSwitch>
+                      <label for="hasNotAudit" class="px-2">
+                        <strong> حسابرسی نشده </strong>
+                      </label>
+                    </div>
+                    <!-- / حسابرسی نشده -->
+                  </div>
+
+                  <div class="row row-cols-lg-2 row-cols-1 my-2">
+                    <!-- اصلی -->
+                    <div
+                      class="col d-flex justify-content-start align-items-center">
+                      <p-inputSwitch
+                        id="isRootAdvert"
+                        name="isRootAdvert"
+                        formControlName="isRootAdvert"></p-inputSwitch>
+                      <label for="isOrginal" class="px-2">
+                        <strong> اصلی </strong>
+                      </label>
+                    </div>
+                    <!-- / اصلی -->
+
+                    <!-- تلفیقی -->
+                    <div
+                      class="col d-flex justify-content-start align-items-center">
+                      <p-inputSwitch
+                        id="isLeafAdvert"
+                        name="isLeafAdvert"
+                        formControlName="isLeafAdvert"></p-inputSwitch>
+                      <label for="isFusion" class="px-2">
+                        <strong> تلفیقی </strong>
+                      </label>
+                    </div>
+                    <!-- / تلفیقی -->
+                  </div>
+
+                  <div class="row row-cols-lg-2 row-cols-1 my-2">
+                    <!-- فقط زیرمجموعه ها -->
+                    <div
+                      class="col d-flex justify-content-start align-items-center">
+                      <p-inputSwitch
+                        id="isLeafCompany"
+                        name="isLeafCompany"
+                        formControlName="isLeafCompany"></p-inputSwitch>
+                      <label for="justSubBrands" class="px-2">
+                        <strong> فقط زیرمجموعه ها </strong>
+                      </label>
+                    </div>
+                    <!-- / فقط زیرمجموعه ها -->
+
+                    <!-- فقط شرکت اصلی -->
+                    <div
+                      class="col d-flex justify-content-start align-items-center">
+                      <p-inputSwitch
+                        id="isRootCompany"
+                        name="isRootCompany"
+                        formControlName="isRootCompany"></p-inputSwitch>
+                      <label for="justMainBrand" class="px-2">
+                        <strong> فقط شرکت اصلی </strong>
+                      </label>
+                    </div>
+                    <!-- / فقط شرکت اصلی -->
+                  </div>
+
+                  <div class="row row-cols-1 mt-2">
+                    <!-- فقط اطلاعیه های منتشره از طرف سازمان -->
+                    <div
+                      class="col d-flex justify-content-start align-items-center">
+                      <p-inputSwitch
+                        id="isHolding"
+                        name="isHolding"
+                        formControlName="isHolding"
+                        (onChange)="disableSearchFields()"></p-inputSwitch>
+                      <label for="justNativeNotification" class="px-2">
+                        <strong> فقط اطلاعیه های منتشره از طرف سازمان </strong>
+                      </label>
+                    </div>
+                    <!-- / فقط اطلاعیه های منتشره از طرف سازمان -->
+                  </div>
+                </p-panel>
+                <!-- / اختصاصی -->
+              </div>
+              <!-- / فیلترها -->
+
+              <!-- دکمه ها -->
+              <div class="d-flex pb-2">
+                <p-button
+                  class="pe-2"
+                  styleClass="p-button-lg"
+                  label="جستجو"
+                  icon="pi pi-search"
+                  type="submit"></p-button>
+
+                <p-button
+                  styleClass="p-button-lg p-button-secondary px-4"
+                  icon="pi pi-eraser"
+                  (click)="resetSerachReportForm()"></p-button>
+              </div>
+              <!-- / دکمه ها -->
+            </form>
+          </p-panel>
+          <!-- search panel -->
+          <!-- / search -->
+        </div>
+
+        <!-- data table -->
+        <p-table
+          #dataTable
+          dataKey="id"
+          [styleClass]="gridClass"
+          [rowHover]="true"
+          [rows]="dataTableRows"
+          [paginator]="true"
+          [totalRecords]="totalCount"
+          [value]="reportList"
+          [loading]="loading"
+          [tableStyle]="{ 'min-width': '75rem' }"
+          [rowsPerPageOptions]="[10, 20, 30]"
+          [lazy]="true"
+          (onLazyLoad)="getReportList($event)"
+          class="data-table d-none d-lg-block">
+          <!-- table header -->
+          <ng-template pTemplate="header">
+            <tr class="data-table__header">
+              <!-- <th style="min-width: 3rem">
+                <strong>ردیف</strong>
+              </th> -->
+
+              <th style="min-width: 14rem">
+                <strong>نام شرکت</strong>
+              </th>
+
+              <th style="min-width: 3rem">
+                <i class="mgc_emergency_flashers_fill data-table__warning"></i>
+              </th>
+
+              <th style="min-width: 25rem">
+                <strong>عنوان اطلاعیه</strong>
+              </th>
+
+              <th style="min-width: 7rem">
+                <strong>کد</strong>
+              </th>
+
+              <th style="min-width: 7rem">
+                <strong>زمان ارسال</strong>
+              </th>
+
+              <th style="min-width: 10rem">
+                <strong>زمان انتشار</strong>
+              </th>
+
+              <th style="min-width: 1rem">
+                <strong>جزئیات</strong>
+              </th>
+
+              <th style="min-width: 1rem">
+                <strong>پیوست‌ها</strong>
+              </th>
+            </tr>
+          </ng-template>
+          <!-- / table header -->
+          <!-- table body -->
+          <ng-template pTemplate="body" let-report let-rowIndex="rowIndex">
+            <tr class="data-table__body">
+              <!-- <td>
+                <strong style="font-size: 17px">
+                  {{ rowIndex + 1 | faNum }}
+                </strong>
+              </td> -->
+
+              <td
+                style="cursor: pointer"
+                (click)="getReportList({}, report.companyId)">
+                {{ report.company | faNum }}
+              </td>
+
+              <td>
+                <i
+                  *ngIf="report.comment"
+                  class="mgc_emergency_flashers_fill data-table__warning"
+                  [pTooltip]="report.comment"></i>
+              </td>
+
+              <td>{{ report.description | faNum }}</td>
+
+              <td>{{ report.code | faNum }}</td>
+
+              <td>{{ report.sendDate | jDate | faNum }}</td>
+
+              <td>{{ report.publishDate | jDate | faNum }}</td>
+
+              <td>
+                <p-button
+                  class="pe-2"
+                  styleClass="p-button-text p-button-rounded p-button-lg"
+                  icon="pi pi-eye"
+                  (click)="previewDetails(report)"></p-button>
+              </td>
+
+              <td>
+                <p-button
+                  class="pe-2"
+                  styleClass="p-button-text p-button-rounded p-button-lg"
+                  icon="pi pi-file"
+                  (click)="previewAttachments(report.id)"></p-button>
+              </td>
+            </tr>
+          </ng-template>
+          <!-- / table body -->
+        </p-table>
+        <!-- data table -->
+
+        <!-- data list -->
+        <div class="data-list d-block d-lg-none">
+          <ul *ngFor="let report of reportList" class="list-group my-1">
+            <!-- نام شرکت -->
+            <li class="list-group-item">
+              <div class="row">
+                <div class="col my-1 text-center">
+                  <strong>نام شرکت</strong>
+                </div>
+
+                <div class="col my-1 text-center">
+                  {{ report.company | faNum }}
+                </div>
+              </div>
+            </li>
+            <!-- / نام شرکت -->
+
+            <!-- اخطار -->
+            <li class="list-group-item">
+              <div class="row">
+                <div class="col my-1 text-center">
+                  <i
+                    class="mgc_emergency_flashers_fill list-group-item__warning">
+                  </i>
+                </div>
+
+                <div class="col my-1 text-center">
+                  {{ report.comment }}
+                </div>
+              </div>
+            </li>
+            <!-- / اخطار -->
+
+            <!-- عنوان اطلاعیه -->
+            <li class="list-group-item">
+              <div class="row">
+                <div class="col my-1 text-center">
+                  <strong>عنوان اطلاعیه</strong>
+                </div>
+
+                <div class="col my-1 text-center">
+                  {{ report.description | faNum }}
+                </div>
+              </div>
+            </li>
+            <!-- / عنوان اطلاعیه -->
+
+            <!-- کد -->
+            <li class="list-group-item">
+              <div class="row">
+                <div class="col my-1 text-center">
+                  <strong>کد</strong>
+                </div>
+
+                <div class="col my-1 text-center">
+                  {{ report.code | faNum }}
+                </div>
+              </div>
+            </li>
+            <!-- / کد -->
+
+            <!-- زمان ارسال -->
+            <li class="list-group-item">
+              <div class="row">
+                <div class="col my-1 text-center">
+                  <strong>زمان ارسال</strong>
+                </div>
+
+                <div class="col my-1 text-center">
+                  {{ report.sendDate | jDate | faNum }}
+                </div>
+              </div>
+            </li>
+            <!-- / زمان ارسال -->
+
+            <!-- زمان انتشار -->
+            <li class="list-group-item">
+              <div class="row">
+                <div class="col my-1 text-center">
+                  <strong>زمان انتشار</strong>
+                </div>
+
+                <div class="col my-1 text-center">
+                  {{ report.publishDate | jDate | faNum }}
+                </div>
+              </div>
+            </li>
+            <!-- / زمان انتشار -->
+
+            <!-- جزئیات -->
+            <li class="list-group-item">
+              <div class="row">
+                <div class="col my-1 text-center">
+                  <strong>جزئیات</strong>
+                </div>
+
+                <div class="col my-1 text-center">
+                  <p-button
+                    class="pe-2"
+                    styleClass="p-button-text p-button-rounded p-button-lg"
+                    icon="pi pi-eye"
+                    (click)="previewDetails(report)"></p-button>
+                </div>
+              </div>
+            </li>
+            <!-- / جزئیات -->
+
+            <!-- پیوست‌ها -->
+            <li class="list-group-item">
+              <div class="row">
+                <div class="col my-1 text-center">
+                  <strong>پیوست‌ها</strong>
+                </div>
+
+                <div class="col my-1 text-center">
+                  <p-button
+                    class="pe-2"
+                    styleClass="p-button-text p-button-rounded"
+                    icon="pi pi-file"
+                    (click)="previewAttachments(report.id)"></p-button>
+                </div>
+              </div>
+            </li>
+            <!-- / پیوست‌ها -->
+          </ul>
+        </div>
+        <!-- / data list -->
+        <!-- / main content table -->
+      </div>
+    </div>
+  </div>
+</section>
+<!-- / main content -->

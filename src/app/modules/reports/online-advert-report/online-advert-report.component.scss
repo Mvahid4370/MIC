@@ -1,0 +1,25 @@
+
+.pi-check-circle{
+    font-size: 15px;
+    font-weight: bold;
+    color: green;
+}
+
+.pi-times-circle{
+    font-size: 15px;
+    font-weight: bold;
+    color: red;
+}
+
+.increase-score{
+    margin-left: 10px;
+    display: inline-block;
+    // direction: ltr;
+    @extend .pi-check-circle;
+}
+
+.decrease-score{
+    display: inline-block;
+    // direction: ltr;
+    @extend .pi-times-circle;
+}

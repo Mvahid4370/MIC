@@ -1,0 +1,74 @@
+<!-- pop up messages -->
+<p-toast key="advertismentTypeDefinition" position="bottom-left"></p-toast>
+
+<!-- data table -->
+<section class="section">
+  <!-- <div class="card">
+    <div class="card-body"> -->
+  <div class="card-text pt-3"></div>
+  <!-- input group -->
+  <div class="pb-2">
+    <p-panel class="search-panel__secation pb-1" header="نیازمندیهای اطلاعیه">
+      <label for="adverType">نوع اطلاعیه</label>
+      <p-treeSelect
+        id="adverType"
+        class="md:w-20rem w-full"
+        containerStyleClass="w-full"
+        [(ngModel)]="selectedNodes"
+        placeholder="انتخاب کنید"
+        [options]="nodes"
+        [filter]="true"
+        [filterInputAutoFocus]="true"
+        (onNodeSelect)="onNodeSelect()"
+        [showClear]="true"></p-treeSelect>
+    </p-panel>
+  </div>
+  <p-table
+    #dataTable
+    class="data-table"
+    dataKey="id"
+    [paginator]="true"
+    [rows]="dataTableRows"
+    [rowsPerPageOptions]="[10, 20, 30]"
+    [styleClass]="gridClass"
+    [rowHover]="true"
+    [value]="needs"
+    [loading]="loading"
+    [responsive]="true"
+    [tableStyle]="{ 'min-width': '75rem' }"
+    [(selection)]="selectedNeeds">
+    <ng-template pTemplate="header">
+      <tr class="data-table__header">
+        <th>
+          <p-tableHeaderCheckbox></p-tableHeaderCheckbox>
+        </th>
+
+        <th>
+          <strong>نام نیازمندی</strong>
+        </th>
+
+        <th>
+          <strong> پسوند </strong>
+        </th>
+      </tr>
+    </ng-template>
+    <ng-template pTemplate="body" let-need let-rowIndex="rowIndex">
+      <tr>
+        <td>
+          <p-tableCheckbox [value]="need"></p-tableCheckbox>
+        </td>
+        <td>{{ need.title }}</td>
+
+        <td>{{ need.extention }}</td>
+      </tr>
+    </ng-template>
+  </p-table>
+
+  <p-button
+    class="pe-2 p-button-wide submit-btn"
+    styleClass="p-button-success"
+    label="ثبت"
+    icon="pi pi-check"
+    (click)="onSubmit()"
+    [loading]="onSubmitLoading"></p-button>
+</section>

@@ -1,0 +1,57 @@
+<!-- بِسْمِ اللهِ الرَّحْمنِ الرَّحِیم -->
+
+<main>
+  <div class="container-fluid">
+    <!-- Header -->
+    <marketwatch-header></marketwatch-header>
+    <!-- / Header -->
+
+    <!-- Sidemenu -->
+    <marketwatch-sidemenu [innerWidth]="innerWidth"></marketwatch-sidemenu>
+    <!-- / Sidemenu -->
+
+    <!-- / Left frame -->
+    <div class="left-frame"></div>
+    <!-- / Left frame -->
+
+    <!-- Main content -->
+    <div class="content">
+      <!-- Main content body -->
+      <div
+        class="content-body"
+        [class.full]="
+          sidemenuService.offcanvasMode || sidemenuService.isClose()
+        "
+        [class.compact]="
+          !sidemenuService.offcanvasMode && !sidemenuService.isClose()
+        ">
+        <!-- page loading screen -->
+        <div class="loading-content">
+          <marketwatch-loading-element
+            [visible]="loading"></marketwatch-loading-element>
+        </div>
+        <!-- / Page loading screen -->
+
+        <!-- http error message -->
+        <p-toast key="httpErrorMessage" position="bottom-left"></p-toast>
+        <!-- / Http error message -->
+
+        <!-- route content viewbox -->
+        <div
+          class="route-content pt-2"
+          [@routeAnimations]="animationService.getRouteAnimationData()">
+          <router-outlet></router-outlet>
+        </div>
+        <!-- / Route content viewbox -->
+      </div>
+      <!-- / Main content body -->
+    </div>
+    <!-- / Main content -->
+
+    <!-- Footer -->
+    <div class="mt-2">
+      <marketwatch-footer> </marketwatch-footer>
+    </div>
+    <!-- / Footer -->
+  </div>
+</main>

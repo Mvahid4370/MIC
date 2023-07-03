@@ -1,0 +1,439 @@
+<!-- pop up messages -->
+<p-toast key="confirmationDefinition" position="bottom-left"></p-toast>
+
+<!-- main content -->
+<section class="section">
+  <div class="card">
+    <div class="card-body">
+      <div class="card-text pt-3"></div>
+      <!-- جستجو -->
+      <div class="pb-2">
+        <form
+          #formDir="ngForm"
+          [formGroup]="AdvertDelayAndDefectReportForm"
+          (ngSubmit)="searchReport()">
+          <p-panel
+            class="search-panel__secation pb-1"
+            header="گزارش نواقص و تاخیر اطلاعیه برخط"
+            iconPos="start"
+            [toggleable]="true"
+            [collapsed]="true">
+            <div class="form-group container">
+              <div class="row">
+                <!-- اطلاعیه-->
+                <div class="col-lg-4 col-md-4 col-sm-12 col-xs-12">
+                  <label for="onlineAdvert">انتخاب اطلاعیه برخط</label>
+                  <p-dropdown
+                    id="onlineAdvert"
+                    name="onlineAdvert"
+                    formControlName="onlineAdvertId"
+                    class="col"
+                    styleClass="w-100"
+                    optionLabel="description"
+                    optionValue="id"
+                    [options]="onlineAdvertLst"
+                    placeholder="انتخاب کنید"
+                    [showClear]="true">
+                  </p-dropdown>
+                </div>
+                <!--/ اطلاعیه-->
+
+                <!-- شرکت -->
+                <div class="col-lg-4 col-md-4 col-sm-12 col-xs-12">
+                  <label for="parent">شرکت</label>
+                  <p-treeSelect
+                    id="parent"
+                    class="md:w-20rem w-full"
+                    containerStyleClass="w-full"
+                    formControlName="companyId"
+                    placeholder="انتخاب کنید"
+                    [options]="parents"
+                    [filter]="true"
+                    [filterInputAutoFocus]="true"
+                    [showClear]="true"></p-treeSelect>
+                </div>
+                <!-- / شرکت -->
+
+                <!-- از تاریخ -->
+                <div class="col-lg-2 col-md-2 col-sm-12 col-xs-12">
+                  <label for="fromDate">از تاریخ</label>
+                  <p-persian-calendar
+                    id="fromDate"
+                    name="fromDate"
+                    formControlName="fromDate"
+                    styleClass="w-100 ">
+                  </p-persian-calendar>
+                </div>
+                <!-- / از تاریخ -->
+
+                <!-- تا تاریخ -->
+                <div class="col-lg-2 col-md-2 col-sm-12 col-xs-12">
+                  <label for="toDate">تا تاریخ</label>
+                  <p-persian-calendar
+                    id="toDate"
+                    name="toDate"
+                    formControlName="toDate"
+                    styleClass="w-100 ">
+                  </p-persian-calendar>
+                </div>
+                <!-- / تا تاریخ -->
+
+                <!-- دکمه -->
+                <div class="d-flex justify-content-end my-1 w-100">
+                  <p-button
+                    class="pe-2"
+                    styleClass="p-button-info w-100"
+                    label="جستجو"
+                    icon="pi pi-search"
+                    type="submit">
+                  </p-button>
+                </div>
+                <!-- / دکمه -->
+              </div>
+            </div>
+          </p-panel>
+        </form>
+      </div>
+      <!-- / جستجو -->
+
+      <!-- data table -->
+      <p-table
+        #dataTable
+        dataKey="id"
+        [styleClass]="gridClass"
+        [paginator]="true"
+        [rows]="dataTableRows"
+        [rowsPerPageOptions]="[10, 20, 30]"
+        [rowHover]="true"
+        [totalRecords]="totalCount"
+        [value]="reportList"
+        [loading]="loading"
+        [tableStyle]="{ 'min-width': '75rem' }"
+        [lazy]="true"
+        (onLazyLoad)="getReportList($event)"
+        class="data-table d-none d-lg-block">
+        <!-- table header -->
+        <ng-template pTemplate="header">
+          <tr class="data-table__header">
+            <!-- <th style="min-width: 3rem">
+              <strong>ردیف</strong>
+            </th> -->
+            <th>
+              <strong> نوع اطلاعیه</strong>
+            </th>
+
+            <th>
+              <strong>تاریخ ثبت</strong>
+            </th>
+
+            <th>
+              <strong>تاریخ تایید</strong>
+            </th>
+
+            <th>
+              <strong>تایید اطلاعیه برخط</strong>
+            </th>
+
+            <th>
+              <strong>انقضا اطلاعیه برخط</strong>
+            </th>
+
+            <th>
+              <strong>امتیاز</strong>
+            </th>
+
+            <th>
+              <strong>وضعیت</strong>
+            </th>
+
+            <th>
+              <strong>توضیحات</strong>
+            </th>
+
+            <th>
+              <strong> نام شرکت</strong>
+            </th>
+
+            <th>
+              <strong> نیازمندی ها</strong>
+            </th>
+          </tr>
+        </ng-template>
+        <!-- / table header -->
+        <!-- table body -->
+        <ng-template pTemplate="body" let-report let-rowIndex="rowIndex">
+          <tr class="data-table__body">
+            <!-- <td>
+              <strong style="font-size: 17px">
+                {{ rowIndex + 1 | faNum }}
+              </strong>
+            </td> -->
+
+            <td>{{ report.advertisementType }}</td>
+
+            <td>{{ report.advertAddedDate }}</td>
+
+            <td>{{ report.advertModifiedDate }}</td>
+
+            <td>
+              {{ report.onlineAdvertDefinitionActiveDate }}
+            </td>
+
+            <td>
+              {{ report.onlineAdvertDefinitionExpiredDate }}
+            </td>
+
+            <td>
+              <span class="increase-score"
+                >{{ report.increaseValueScore | faNum }}+</span
+              >
+              <span class="decrease-score"
+                >{{ report.decreaseValueScore | faNum }}-</span
+              >
+            </td>
+
+            <td>
+              {{ report.advertStatus }}
+              <div
+                [style]="getSttColor(report.advertStatusColor)"
+                class="stt-style"></div>
+            </td>
+
+            <td>{{ report.advertDescription }}</td>
+
+            <td>{{ report.advertCompanyName }}</td>
+
+            <td style="padding: 0px">
+              <p-overlayPanel #op>
+                <ng-template pTemplate="content">
+                  <div
+                    *ngFor="let item of report.onlineAdvertNeedsInfos"
+                    style="font-size: 13px">
+                    <span
+                      ><i *ngIf="item.isAdded" class="pi pi-check-circle"></i>
+                      <i *ngIf="!item.isAdded" class="pi pi-times-circle"></i>
+                      {{ item.name }}</span
+                    >
+                  </div>
+                </ng-template>
+              </p-overlayPanel>
+
+              <button
+                *ngIf="
+                  report.onlineAdvertNeedsInfosCount !==
+                  report.advertMultiMediasCount
+                "
+                type="button"
+                class="btn btn-warning dropdown-toggle btn-needs"
+                data-toggle="dropdown"
+                aria-haspopup="true"
+                aria-expanded="false"
+                (click)="op.toggle($event)">
+                ناقص
+              </button>
+
+              <button
+                *ngIf="
+                  report.onlineAdvertNeedsInfosCount ===
+                  report.advertMultiMediasCount
+                "
+                type="button"
+                class="btn btn-success dropdown-toggle btn-needs"
+                data-toggle="dropdown"
+                aria-haspopup="true"
+                aria-expanded="false"
+                (click)="op.toggle($event)">
+                کامل
+              </button>
+            </td>
+          </tr>
+        </ng-template>
+        <!-- / table body -->
+      </p-table>
+      <!-- data table -->
+
+      <!-- data list -->
+      <div class="data-list d-block d-lg-none">
+        <ul *ngFor="let report of reportList" class="list-group my-1">
+          <!-- اطلاعیه -->
+          <li class="list-group-item">
+            <div class="row">
+              <div class="col my-1 text-center">
+                <strong> نوع اطلاعیه</strong>
+              </div>
+
+              <div class="col my-1 text-center">
+                {{ report.advertisementType }}
+              </div>
+            </div>
+          </li>
+          <!-- / اطلاعیه -->
+
+          <!-- تاریخ ثبت -->
+          <li class="list-group-item">
+            <div class="row">
+              <div class="col my-1 text-center">
+                <strong>تاریخ ثبت</strong>
+              </div>
+
+              <div class="col my-1 text-center">
+                {{ report.advertAddedDate }}
+              </div>
+            </div>
+          </li>
+          <!-- / تاریخ ثبت -->
+
+          <!-- تاریخ تایید -->
+          <li class="list-group-item">
+            <div class="row">
+              <div class="col my-1 text-center">
+                <strong>تاریخ تایید</strong>
+              </div>
+
+              <div class="col my-1 text-center">
+                {{ report.advertModifiedDate }}
+              </div>
+            </div>
+          </li>
+          <!-- / تاریخ تایید -->
+
+          <!-- تایید اطلاعیه برخط -->
+          <li class="list-group-item">
+            <div class="row">
+              <div class="col my-1 text-center">
+                <strong>تایید اطلاعیه برخط</strong>
+              </div>
+
+              <div class="col my-1 text-center">
+                {{ report.onlineAdvertDefinitionActiveDate }}
+              </div>
+            </div>
+          </li>
+          <!-- / تایید اطلاعیه برخط -->
+
+          <!-- انقضا اطلاعیه برخط -->
+          <li class="list-group-item">
+            <div class="row">
+              <div class="col my-1 text-center">
+                <strong>انقضا اطلاعیه برخط</strong>
+              </div>
+
+              <div class="col my-1 text-center">
+                {{ report.onlineAdvertDefinitionExpiredDate }}
+              </div>
+            </div>
+          </li>
+          <!-- / انقضا اطلاعیه برخط -->
+
+          <!-- امتیاز -->
+          <li class="list-group-item">
+            <div class="row">
+              <div class="col my-1 text-center">
+                <strong>امتیاز</strong>
+              </div>
+
+              <div class="col my-1 text-center">
+                <span class="increase-score"
+                  >{{ report.increaseValueScore }}+</span
+                >
+                <span class="decrease-score"
+                  >{{ report.decreaseValueScore }}-</span
+                >
+              </div>
+            </div>
+          </li>
+          <!-- / امتیاز -->
+
+          <!-- وضعیت -->
+          <li class="list-group-item">
+            <div class="row">
+              <div class="col my-1 text-center">
+                <strong>وضعیت</strong>
+              </div>
+
+              <div class="col my-1 text-center">
+                {{ report.advertStatus }}
+              </div>
+            </div>
+          </li>
+          <!-- / وضعیت -->
+
+          <!-- توضیحات -->
+          <li class="list-group-item">
+            <div class="row">
+              <div class="col my-1 text-center">
+                <strong>توضیحات</strong>
+              </div>
+
+              <div class="col my-1 text-center">
+                {{ report.advertDescription }}
+              </div>
+            </div>
+          </li>
+          <!-- / توضیحات -->
+
+          <!-- نام شرکت-->
+          <li class="list-group-item">
+            <div class="row">
+              <div class="col my-1 text-center">
+                <strong> نام شرکت</strong>
+              </div>
+
+              <div class="col my-1 text-center">
+                {{ report.advertCompanyName }}
+              </div>
+            </div>
+          </li>
+          <!-- / نام شرکت -->
+
+          <!-- نیازمندی ها -->
+          <li class="list-group-item">
+            <div class="row">
+              <div class="col my-1 text-center">
+                <strong> نیازمندی ها</strong>
+              </div>
+
+              <div class="col my-1 text-center">
+                <p-overlayPanel #op>
+                  <ng-template pTemplate="content">
+                    <div
+                      *ngFor="let item of report.onlineAdvertNeedsInfos"
+                      style="font-size: 13px">
+                      <span
+                        ><i *ngIf="item.isAdded" class="pi pi-check-circle"></i>
+                        <i *ngIf="!item.isAdded" class="pi pi-times-circle"></i>
+                        {{ item.name }}</span
+                      >
+                    </div>
+                  </ng-template>
+                </p-overlayPanel>
+                <button
+                  *ngIf="
+                    report.onlineAdvertNeedsInfosCount !==
+                    report.advertMultiMediasCount
+                  "
+                  class="bg-red"
+                  (click)="op.toggle($event)">
+                  ناقص
+                </button>
+
+                <button
+                  *ngIf="
+                    report.onlineAdvertNeedsInfosCount ===
+                    report.advertMultiMediasCount
+                  "
+                  class="bg-green"
+                  (click)="op.toggle($event)">
+                  کامل
+                </button>
+              </div>
+            </div>
+          </li>
+          <!-- / نیازمندی ها -->
+        </ul>
+      </div>
+      <!-- / data list -->
+    </div>
+  </div>
+</section>
+<!-- / main content -->

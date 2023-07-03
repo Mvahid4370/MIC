@@ -1,0 +1,13 @@
+/* بِسْمِ اللهِ الرَّحْمنِ الرَّحِیم *//* بِسْمِ اللهِ الرَّحْمنِ الرَّحِیم */
+
+:host ::ng-deep .p-button {
+    min-width: 9rem;
+}
+
+:host ::ng-deep .custom-style {
+    min-width: unset!important;
+}
+
+:host ::ng-deep .p-blockui {
+    z-index: 95 !important;
+}

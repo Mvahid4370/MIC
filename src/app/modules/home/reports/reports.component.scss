@@ -1,0 +1,40 @@
+/* بِسْمِ اللهِ الرَّحْمنِ الرَّحِیم */
+
+.section {
+  .data-table {
+    .data-table__header,
+    .data-table__body {
+      .data-table__warning {
+        font-size: 26px;
+        padding-top: 1px;
+
+        &::before {
+          color: crimson !important;
+        }
+      }
+    }
+  }
+
+  .list-group-item {
+    .list-group-item__warning {
+      font-size: 26px;
+      padding-top: 1px;
+
+      &::before {
+        color: crimson;
+      }
+    }
+  }
+}
+
+.report-attachment {
+  li {
+    direction: ltr !important;
+  }
+}
+
+:host ::ng-deep .p-panel {
+  .p-panel-content {
+    min-height: 24rem;
+  }
+}

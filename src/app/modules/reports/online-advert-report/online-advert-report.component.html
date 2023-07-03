@@ -1,0 +1,383 @@
+<!-- pop up messages -->
+<p-toast key="confirmationDefinition" position="bottom-left"></p-toast>
+
+<!-- main content -->
+<section class="section">
+  <div class="card">
+    <div class="card-body">
+      <div class="card-text pt-3"></div>
+      <!-- جستجو -->
+      <div class="pb-2">
+        <form
+          #formDir="ngForm"
+          [formGroup]="OnlineAdvertReportForm"
+          (ngSubmit)="searchReport()">
+          <p-panel
+            class="search-panel__secation pb-1"
+            header="گزارش کلی اطلاعیه های برخط"
+            iconPos="start"
+            [toggleable]="true"
+            [collapsed]="true">
+            <div class="form-group container">
+              <div class="row row-cols-lg-3 row-cols-1 pb-m-1 pb-2">
+                <!-- اطلاعیه-->
+                <div class="col my-1">
+                  <label for="adverType">نوع اطلاعیه</label>
+                  <p-treeSelect
+                    id="advertismentTypes"
+                    class="md:w-20rem w-full"
+                    containerStyleClass="w-full"
+                    formControlName="advertisementTypeId"
+                    placeholder="انتخاب کنید"
+                    [options]="advertismentTypes"
+                    [filter]="true"
+                    [filterInputAutoFocus]="true"
+                    [showClear]="true"></p-treeSelect>
+                </div>
+                <!--/ اطلاعیه-->
+
+                <!-- از تاریخ -->
+                <div class="col my-1">
+                  <label for="fromDate">از تاریخ</label>
+                  <p-persian-calendar
+                    id="fromDate"
+                    name="fromDate"
+                    formControlName="fromDate"
+                    styleClass="w-100 ">
+                  </p-persian-calendar>
+                </div>
+                <!-- / از تاریخ -->
+
+                <!-- تا تاریخ -->
+                <div class="col my-1">
+                  <label for="toDate">تا تاریخ</label>
+                  <p-persian-calendar
+                    id="toDate"
+                    name="toDate"
+                    formControlName="toDate"
+                    styleClass="w-100 ">
+                  </p-persian-calendar>
+                </div>
+                <!-- / تا تاریخ -->
+
+                <!-- دکمه -->
+                <div class="d-flex justify-content-end my-1 w-100">
+                  <p-button
+                    class="pe-2"
+                    styleClass="p-button-info w-100"
+                    label="جستجو"
+                    icon="pi pi-search"
+                    type="submit">
+                  </p-button>
+                </div>
+                <!-- / دکمه -->
+              </div>
+            </div>
+          </p-panel>
+        </form>
+      </div>
+      <!-- / جستجو -->
+
+      <!-- data table -->
+      <p-table
+        #dataTable
+        dataKey="id"
+        [styleClass]="gridClass"
+        [paginator]="true"
+        [rows]="dataTableRows"
+        [rowsPerPageOptions]="[10, 20, 30]"
+        [rowHover]="true"
+        [totalRecords]="totalCount"
+        [value]="reportList"
+        [loading]="loading"
+        [tableStyle]="{ 'min-width': '75rem' }"
+        [lazy]="true"
+        (onLazyLoad)="getReportList($event)"
+        class="data-table d-none d-lg-block">
+        <!-- table header -->
+        <ng-template pTemplate="header">
+          <tr class="data-table__header">
+            <!-- <th style="min-width: 3rem">
+              <strong>ردیف</strong>
+            </th> -->
+            <th>
+              <strong>عنوان اطلاعیه</strong>
+            </th>
+
+            <th>
+              <strong>تاریخ فعالسازی</strong>
+            </th>
+
+            <th>
+              <strong>تاریخ انقضا</strong>
+            </th>
+
+            <th>
+              <strong>فعال بودن</strong>
+            </th>
+
+            <th>
+              <strong>امتیاز</strong>
+            </th>
+
+            <th>
+              <strong>تعداد شرکت</strong>
+            </th>
+
+            <th>
+              <strong>کل اطلاعیه ها</strong>
+            </th>
+
+            <th>
+              <strong> تایید شده</strong>
+            </th>
+
+            <th>
+              <strong> رد شده</strong>
+            </th>
+
+            <th>
+              <strong> بازگشتی</strong>
+            </th>
+
+            <th>
+              <strong> بررسی نشده</strong>
+            </th>
+
+            <th>
+              <strong>توضیحات</strong>
+            </th>
+          </tr>
+        </ng-template>
+        <!-- / table header -->
+        <!-- table body -->
+        <ng-template pTemplate="body" let-report let-rowIndex="rowIndex">
+          <tr class="data-table__body">
+            <!-- <td>
+              <strong style="font-size: 17px">
+                {{ rowIndex + 1 | faNum }}
+              </strong>
+            </td> -->
+
+            <td>{{ report.title }}</td>
+
+            <td>{{ report.activeDate }}</td>
+
+            <td>{{ report.expiredDate }}</td>
+
+            <td>
+              <i *ngIf="report.isActive" class="pi pi-check-circle"></i>
+              <i *ngIf="!report.isActive" class="pi pi-times-circle"></i>
+            </td>
+
+            <td>
+              <span class="increase-score"
+                >{{ report.increaseValueScore | faNum }}+</span
+              >
+              <span class="decrease-score"
+                >{{ report.decreaseValueScore | faNum }}-</span
+              >
+            </td>
+
+            <td>{{ report.companyCount | faNum }}</td>
+
+            <td>{{ report.totalAdvertCount | faNum }}</td>
+
+            <td>{{ report.acceptedAdvertCount | faNum }}</td>
+
+            <td>{{ report.disapprovalAdvertCount | faNum }}</td>
+
+            <td>{{ report.failedAdvertCount | faNum }}</td>
+
+            <td>{{ report.notCheckedAdvertCount | faNum }}</td>
+
+            <td>{{ report.description }}</td>
+          </tr>
+        </ng-template>
+        <!-- / table body -->
+      </p-table>
+      <!-- data table -->
+
+      <!-- data list -->
+      <div class="data-list d-block d-lg-none">
+        <ul *ngFor="let report of reportList" class="list-group my-1">
+          <!-- اطلاعیه -->
+          <li class="list-group-item">
+            <div class="row">
+              <div class="col my-1 text-center">
+                <strong>عنوان اطلاعیه</strong>
+              </div>
+
+              <div class="col my-1 text-center">
+                {{ report.title }}
+              </div>
+            </div>
+          </li>
+          <!-- / اطلاعیه -->
+
+          <!-- تاریخ فعالسازی -->
+          <li class="list-group-item">
+            <div class="row">
+              <div class="col my-1 text-center">
+                <strong>تاریخ فعالسازی</strong>
+              </div>
+
+              <div class="col my-1 text-center">
+                {{ report.activeDate }}
+              </div>
+            </div>
+          </li>
+          <!-- / تاریخ فعالسازی -->
+
+          <!-- تاریخ انقضا -->
+          <li class="list-group-item">
+            <div class="row">
+              <div class="col my-1 text-center">
+                <strong>تاریخ انقضا</strong>
+              </div>
+
+              <div class="col my-1 text-center">
+                {{ report.expiredDate }}
+              </div>
+            </div>
+          </li>
+          <!-- / تاریخ انقضا -->
+
+          <!-- فعال بودن -->
+          <li class="list-group-item">
+            <div class="row">
+              <div class="col my-1 text-center">
+                <strong>فعال بودن</strong>
+              </div>
+
+              <div class="col my-1 text-center">
+                <i *ngIf="report.isActive" class="pi pi-check-circle"></i>
+                <i *ngIf="!report.isActive" class="pi pi-times-circle"></i>
+              </div>
+            </div>
+          </li>
+          <!-- / فعال بودن -->
+
+          <!-- امتیاز -->
+          <li class="list-group-item">
+            <div class="row">
+              <div class="col my-1 text-center">
+                <strong>امتیاز</strong>
+              </div>
+
+              <div class="col my-1 text-center">
+                <span class="increase-score"
+                  >{{ report.increaseValueScore }}+</span
+                >
+                <span class="decrease-score"
+                  >{{ report.decreaseValueScore }}-</span
+                >
+              </div>
+            </div>
+          </li>
+          <!-- / امتیاز -->
+
+          <!-- تعداد شرکت -->
+          <li class="list-group-item">
+            <div class="row">
+              <div class="col my-1 text-center">
+                <strong>تعداد شرکت</strong>
+              </div>
+
+              <div class="col my-1 text-center">
+                {{ report.companyCount | faNum }}
+              </div>
+            </div>
+          </li>
+          <!-- / تعداد شرکت -->
+
+          <!-- کل اطلاعیه ها -->
+          <li class="list-group-item">
+            <div class="row">
+              <div class="col my-1 text-center">
+                <strong>کل اطلاعیه ها</strong>
+              </div>
+
+              <div class="col my-1 text-center">
+                {{ report.totalAdvertCount | faNum }}
+              </div>
+            </div>
+          </li>
+          <!-- / کل اطلاعیه ها -->
+
+          <!-- اطلاعیه های تایید شده-->
+          <li class="list-group-item">
+            <div class="row">
+              <div class="col my-1 text-center">
+                <strong> تایید شده</strong>
+              </div>
+
+              <div class="col my-1 text-center">
+                {{ report.acceptedAdvertCount | faNum }}
+              </div>
+            </div>
+          </li>
+          <!-- / اطلاعیه های تایید شده -->
+
+          <!-- اطلاعیه های رد شده -->
+          <li class="list-group-item">
+            <div class="row">
+              <div class="col my-1 text-center">
+                <strong> رد شده</strong>
+              </div>
+
+              <div class="col my-1 text-center">
+                {{ report.disapprovalAdvertCount | faNum }}
+              </div>
+            </div>
+          </li>
+          <!-- / اطلاعیه های رد شده -->
+
+          <!-- اطلاعیه های بازگشتی -->
+          <li class="list-group-item">
+            <div class="row">
+              <div class="col my-1 text-center">
+                <strong> بازگشتی</strong>
+              </div>
+
+              <div class="col my-1 text-center">
+                {{ report.failedAdvertCount | faNum }}
+              </div>
+            </div>
+          </li>
+          <!-- / اطلاعیه های بازگشتی -->
+
+          <!-- اطلاعیه های بررسی نشده -->
+          <li class="list-group-item">
+            <div class="row">
+              <div class="col my-1 text-center">
+                <strong> بررسی نشده</strong>
+              </div>
+
+              <div class="col my-1 text-center">
+                {{ report.notCheckedAdvertCount | faNum }}
+              </div>
+            </div>
+          </li>
+          <!-- / اطلاعیه های بررسی نشده -->
+
+          <!-- توضیحات -->
+          <li class="list-group-item">
+            <div class="row">
+              <div class="col my-1 text-center">
+                <strong>توضیحات</strong>
+              </div>
+
+              <div class="col my-1 text-center">
+                {{ report.description }}
+              </div>
+            </div>
+          </li>
+          <!-- / توضیحات -->
+        </ul>
+      </div>
+      <!-- / data list -->
+    </div>
+  </div>
+</section>
+<!-- / main content -->

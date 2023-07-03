@@ -1,0 +1,498 @@
+<!-- بِسْمِ اللهِ الرَّحْمنِ الرَّحِیم -->
+
+<!-- main content -->
+<section class="section">
+  <div class="card">
+    <div class="card-body">
+      <div class="card-text pt-3"></div>
+
+      <!-- جستجو -->
+      <div class="pb-2">
+        <p-panel
+          class="search-panel__secation pb-1"
+          header="جستجو"
+          iconPos="start"
+          [toggleable]="true"
+          [collapsed]="true">
+          <div class="d-flex justify-content-between w-100">
+            <div class="p-input-icon-left w-75">
+              <i class="pi pi-search pi-search-box"></i>
+              <label for="companyName">نام شرکت</label>
+              <input
+                id="companyName"
+                pInputText
+                class="w-100"
+                type="text"
+                [(ngModel)]="companyName" />
+            </div>
+
+            <p-button
+              style="padding-top: 20px"
+              class="pe-2 p-button-wide"
+              styleClass="p-button-info"
+              label="جستجو"
+              icon="pi pi-search"
+              (click)="getCompanyList({}, companyName)"></p-button>
+          </div>
+        </p-panel>
+      </div>
+      <!-- جستجو -->
+
+      <!-- data table -->
+      <p-table
+        #dataTable
+        dataKey="id"
+        class="data-table d-none d-lg-block"
+        [styleClass]="gridClass"
+        [rowHover]="true"
+        [paginator]="true"
+        [rows]="dataTableRows"
+        [totalRecords]="totalCount"
+        [value]="companyList"
+        [loading]="loading"
+        [tableStyle]="{ 'min-width': '75rem' }"
+        [rowsPerPageOptions]="[10, 20, 30]"
+        [lazy]="true"
+        (onLazyLoad)="getCompanyList($event, companyName)">
+        <!-- table header -->
+        <ng-template pTemplate="header">
+          <tr class="data-table__header">
+            <!-- <th style="min-width: 3rem">
+              <strong>ردیف</strong>
+            </th> -->
+
+            <th style="min-width: 1rem">
+              <strong>جزئیات</strong>
+            </th>
+
+            <th style="min-width: 10rem">
+              <strong>نام شرکت</strong>
+            </th>
+
+            <th style="min-width: 10rem">
+              <strong>کد صنعت (ISIC)</strong>
+            </th>
+          </tr>
+        </ng-template>
+        <!-- / table header -->
+        <!-- table body -->
+        <ng-template pTemplate="body" let-company let-rowIndex="rowIndex">
+          <tr>
+            <!-- <td>
+              <strong style="font-size: 17px">
+                {{ rowIndex + 1 | faNum }}
+              </strong>
+            </td> -->
+
+            <td>
+              <p-button
+                styleClass="p-button-text p-button-rounded p-button-lg"
+                icon="pi pi-eye"
+                (click)="previewDetails(company)"></p-button>
+            </td>
+
+            <td>{{ company.companyName }}</td>
+
+            <td>{{ company.isic | faNum }}</td>
+          </tr>
+        </ng-template>
+        <!-- / table body -->
+      </p-table>
+      <!-- data table -->
+
+      <!-- data list -->
+      <div class="data-list d-block d-lg-none">
+        <ul *ngFor="let company of companyList" class="list-group my-1">
+          <!-- نام شرکت -->
+          <li class="list-group-item">
+            <div class="row">
+              <div class="col my-1 text-center">
+                <strong>نام شرکت</strong>
+              </div>
+
+              <div class="col my-1 text-center">
+                {{ company.companyName }}
+              </div>
+            </div>
+          </li>
+          <!-- / نام شرکت -->
+
+          <!-- کد صنعت (ISIC) -->
+          <li class="list-group-item">
+            <div class="row">
+              <div class="col my-1 text-center">
+                <strong>کد صنعت (ISIC)</strong>
+              </div>
+
+              <div class="col my-1 text-center">
+                {{ company.isic || '' | faNum }}
+              </div>
+            </div>
+          </li>
+          <!-- / کد صنعت (ISIC) -->
+
+          <!-- کد صنعت (ISIC) -->
+          <li class="list-group-item">
+            <div class="row">
+              <div class="col my-1 text-center">
+                <strong>جزئیات</strong>
+              </div>
+
+              <div class="col my-1 text-center">
+                <p-button
+                  styleClass="p-button-text p-button-rounded p-button-lg"
+                  icon="pi pi-eye"
+                  (click)="previewDetails(company)"></p-button>
+              </div>
+            </div>
+          </li>
+          <!-- / کد صنعت (ISIC) -->
+        </ul>
+      </div>
+      <!-- / data list -->
+    </div>
+  </div>
+</section>
+
+<!-- preview report detail -->
+<p-dialog
+  styleClass="p-fluid"
+  header="جزئیات"
+  [style]="{ width: '800px', height: '640px' }"
+  [modal]="true"
+  [(visible)]="previewDetailsDialog">
+  <!-- dialog content -->
+  <ng-template pTemplate="content">
+    <div class="data-table-detail__content-info">
+      <!-- data list -->
+      <div class="data-list">
+        <ul class="list-group">
+          <!-- نام شرکت -->
+          <li class="list-group-item">
+            <div class="row">
+              <div class="col-2 my-1">
+                <strong>نام شرکت</strong>
+              </div>
+
+              <div class="col my-1 text-center">
+                {{ selectedCompany.companyName }}
+              </div>
+            </div>
+          </li>
+          <!-- / نام شرکت -->
+
+          <!-- نماد -->
+          <li class="list-group-item">
+            <div class="row">
+              <div class="col-2 my-1">
+                <strong>نماد</strong>
+              </div>
+
+              <div class="col my-1 text-center">
+                {{ selectedCompany.symbol | faNum }}
+              </div>
+            </div>
+          </li>
+          <!-- / نماد -->
+
+          <!-- سرمایه ثبت شده -->
+          <li class="list-group-item">
+            <div class="row">
+              <div class="col-2 my-1">
+                <strong>سرمایه ثبت شده</strong>
+              </div>
+
+              <div class="col my-1 text-center">
+                {{ selectedCompany.registeredCapital | irCurrency | faNum }}
+              </div>
+            </div>
+          </li>
+          <!-- / سرمایه ثبت شده -->
+
+          <!-- سرمایه ثبت نشده -->
+          <li class="list-group-item">
+            <div class="row">
+              <div class="col-2 my-1">
+                <strong>سرمایه ثبت نشده</strong>
+              </div>
+
+              <div class="col my-1 text-center">
+                {{ selectedCompany.nonRegisteredCapital | irCurrency | faNum }}
+              </div>
+            </div>
+          </li>
+          <!-- / سرمایه ثبت نشده -->
+
+          <!-- ISIC -->
+          <li class="list-group-item">
+            <div class="row">
+              <div class="col-2 my-1">
+                <strong>ISIC</strong>
+              </div>
+
+              <div class="col my-1 text-center">
+                {{ selectedCompany.isic || '' | faNum }}
+              </div>
+            </div>
+          </li>
+          <!-- / ISIC -->
+
+          <!-- ISIN -->
+          <li class="list-group-item">
+            <div class="row">
+              <div class="col-2 my-1">
+                <strong>ISIN</strong>
+              </div>
+
+              <div class="col my-1 text-center">
+                {{ selectedCompany.companyISIN }}
+              </div>
+            </div>
+          </li>
+          <!-- / ISIN -->
+
+          <!-- شناسه ملی -->
+          <li class="list-group-item">
+            <div class="row">
+              <div class="col-2 my-1">
+                <strong>شناسه ملی</strong>
+              </div>
+
+              <div class="col my-1 text-center">
+                {{ selectedCompany.registerNumber || '' | faNum }}
+              </div>
+            </div>
+          </li>
+          <!-- / شناسه ملی -->
+
+          <!-- وضعیت -->
+          <li class="list-group-item">
+            <div class="row">
+              <div class="col-2 my-1">
+                <strong>وضعیت</strong>
+              </div>
+
+              <div class="col my-1 text-center">
+                {{ selectedCompany.publisherStatus }}
+              </div>
+            </div>
+          </li>
+          <!-- / وضعیت -->
+
+          <!--	پایان سال مالی -->
+          <li class="list-group-item">
+            <div class="row">
+              <div class="col-2 my-1">
+                <strong>پایان سال مالی</strong>
+              </div>
+
+              <div class="col my-1 text-center">
+                {{ selectedCompany.yearEnd | jDate | faNum }}
+              </div>
+            </div>
+          </li>
+          <!-- / پایان سال مالی -->
+
+          <!-- ماهیت -->
+          <li class="list-group-item">
+            <div class="row">
+              <div class="col-2 my-1">
+                <strong>ماهیت</strong>
+              </div>
+
+              <div class="col my-1 text-center">
+                {{ selectedCompany.reportingType }}
+              </div>
+            </div>
+          </li>
+          <!-- / ماهیت -->
+
+          <!-- موضوع فعالیت -->
+          <li class="list-group-item">
+            <div class="row">
+              <div class="col-2 my-1">
+                <strong>موضوع فعالیت</strong>
+              </div>
+
+              <div class="col my-1 text-center">
+                {{ selectedCompany.activitySubject }}
+              </div>
+            </div>
+          </li>
+          <!-- / موضوع فعالیت -->
+
+          <!-- آدرس کارخانه -->
+          <li class="list-group-item">
+            <div class="row">
+              <div class="col-2 my-1">
+                <strong>آدرس کارخانه</strong>
+              </div>
+
+              <div class="col my-1 text-center">
+                {{ selectedCompany.factoryAddress }}
+              </div>
+            </div>
+          </li>
+          <!-- / آدرس کارخانه -->
+
+          <!-- تلفن کارخانه (کد) -->
+          <li class="list-group-item">
+            <div class="row">
+              <div class="col-2 my-1">
+                <strong>تلفن کارخانه (کد)</strong>
+              </div>
+
+              <div class="col my-1 text-center">
+                {{ selectedCompany.factoryTelephone || '' | faNum }}
+              </div>
+            </div>
+          </li>
+          <!-- / تلفن کارخانه (کد) -->
+
+          <!-- نمابر کارخانه (کد) -->
+          <li class="list-group-item">
+            <div class="row">
+              <div class="col-2 my-1">
+                <strong>نمابر کارخانه (کد)</strong>
+              </div>
+
+              <div class="col my-1 text-center">
+                {{ selectedCompany.factoryFax || '' | faNum }}
+              </div>
+            </div>
+          </li>
+          <!-- / نمابر کارخانه (کد) -->
+
+          <!-- آدرس امور سهام  -->
+          <li class="list-group-item">
+            <div class="row">
+              <div class="col-2 my-1">
+                <strong>آدرس امور سهام </strong>
+              </div>
+
+              <div class="col my-1 text-center">
+                {{ selectedCompany.stockAffairsOffice }}
+              </div>
+            </div>
+          </li>
+          <!-- / آدرس امور سهام -->
+
+          <!-- تلفن امور سهام (کد) -->
+          <li class="list-group-item">
+            <div class="row">
+              <div class="col-3 my-1">
+                <strong>تلفن امور سهام (کد)</strong>
+              </div>
+
+              <div class="col my-1 text-center">
+                {{ selectedCompany.stockAffairsTelephone || '' | faNum }}
+              </div>
+            </div>
+          </li>
+          <!-- / تلفن امور سهام (کد) -->
+
+          <!-- نمابر امور سهام (کد) -->
+          <li class="list-group-item">
+            <div class="row">
+              <div class="col-3 my-1">
+                <strong>نمابر امور سهام (کد)</strong>
+              </div>
+
+              <div class="col my-1 text-center">
+                {{ selectedCompany.stockAffairsFax || '' | faNum }}
+              </div>
+            </div>
+          </li>
+          <!-- / نمابر امور سهام (کد) -->
+
+          <!-- آدرس دفتر مرکزی -->
+          <li class="list-group-item">
+            <div class="row">
+              <div class="col-2 my-1">
+                <strong>آدرس دفتر مرکزی</strong>
+              </div>
+
+              <div class="col my-1 text-center">
+                {{ selectedCompany.centeralOffice }}
+              </div>
+            </div>
+          </li>
+          <!-- / آدرس دفتر مرکزی -->
+
+          <!-- تلفن دفتر مرکزی (کد) -->
+          <li class="list-group-item">
+            <div class="row">
+              <div class="col-3 my-1">
+                <strong>تلفن دفتر مرکزی (کد)</strong>
+              </div>
+
+              <div class="col my-1 text-center">
+                {{ selectedCompany.centeralOfficeTelephone || '' | faNum }}
+              </div>
+            </div>
+          </li>
+          <!-- / تلفن دفتر مرکزی (کد) -->
+
+          <!-- نمابر دفتر مرکزی (کد) -->
+          <li class="list-group-item">
+            <div class="row">
+              <div class="col-3 my-1">
+                <strong>نمابر دفتر مرکزی (کد)</strong>
+              </div>
+
+              <div class="col my-1 text-center">
+                {{ selectedCompany.centeralOfficeFax || '' | faNum }}
+              </div>
+            </div>
+          </li>
+          <!-- / نمابر دفتر مرکزی (کد) -->
+
+          <!-- مدیر عامل -->
+          <li class="list-group-item">
+            <div class="row">
+              <div class="col-2 my-1">
+                <strong>مدیر عامل</strong>
+              </div>
+
+              <div class="col my-1 text-center">
+                {{ selectedCompany.managingDirector }}
+              </div>
+            </div>
+          </li>
+          <!-- / مدیر عامل -->
+
+          <!-- مدیر مالی -->
+          <li class="list-group-item">
+            <div class="row">
+              <div class="col-2 my-1">
+                <strong>مدیر مالی</strong>
+              </div>
+
+              <div class="col my-1 text-center">
+                {{ selectedCompany.financialManager }}
+              </div>
+            </div>
+          </li>
+          <!-- / مدیر مالی -->
+
+          <!-- اعضای هیات مدیره -->
+          <li class="list-group-item">
+            <div class="row">
+              <div class="col-3 my-1">
+                <strong>اعضای هیات مدیره</strong>
+              </div>
+
+              <div class="col my-1 text-center">
+                {{ selectedCompany.boardofDirectors }}
+              </div>
+            </div>
+          </li>
+          <!-- / اعضای هیات مدیره -->
+        </ul>
+      </div>
+      <!-- / data list -->
+    </div>
+  </ng-template>
+  <!-- / dialog content -->
+</p-dialog>
+<!-- / preview report detail -->

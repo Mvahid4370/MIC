@@ -1,0 +1,199 @@
+<!-- pop up messages -->
+<p-toast key="myApprovalDefinition" position="bottom-left"></p-toast>
+
+<!-- data table -->
+<section class="section">
+  <!-- <div class="card">
+    <div class="card-body"> -->
+  <div class="card-text pt-3"></div>
+  <p-panel class="search-panel__secation pb-1" header="تاییدات من">
+    <!-- data table -->
+    <p-table
+      #dataTable
+      class="data-table d-none d-lg-block"
+      dataKey="id"
+      [paginator]="true"
+      [rows]="dataTableRows"
+      [rowsPerPageOptions]="[10, 20, 30]"
+      [styleClass]="gridClass"
+      [rowHover]="true"
+      [totalRecords]="totalCount"
+      [value]="myApprovalsLst"
+      [loading]="loading"
+      [tableStyle]="{ 'min-width': '75rem' }"
+      [lazy]="true"
+      (onLazyLoad)="getMyConfirms($event)">
+      <!-- table header -->
+      <ng-template pTemplate="header">
+        <tr class="data-table__header">
+          <!-- <th style="min-width: 3rem">
+              <strong>ردیف</strong>
+            </th> -->
+          <th>
+            <strong>نام شرکت</strong>
+          </th>
+
+          <th>
+            <strong>عنوان اطلاعیه</strong>
+          </th>
+
+          <th>
+            <strong>زمان ارسال</strong>
+          </th>
+
+          <th>
+            <strong>زمان بررسی</strong>
+          </th>
+
+          <th>
+            <strong>زمان دریافت</strong>
+          </th>
+
+          <th>
+            <strong> وضعیت </strong>
+          </th>
+
+          <th>
+            <strong> توضیحات </strong>
+          </th>
+        </tr>
+      </ng-template>
+      <!-- / table header -->
+      <!-- table body -->
+      <ng-template pTemplate="body" let-myApproval let-rowIndex="rowIndex">
+        <tr>
+          <!-- <td>
+              <strong style="font-size: 17px">
+                {{ rowIndex + 1 | faNum }}
+              </strong>
+            </td> -->
+
+          <td>{{ myApproval.publisherCompanyName | faNum }}</td>
+
+          <td>{{ myApproval.advertisementSubject | faNum }}</td>
+
+          <td>{{ myApproval.sendDatePersian | jDate | faNum }}</td>
+
+          <td>{{ myApproval.myCheckedDatePersian | jDate | faNum }}</td>
+
+          <td>{{ myApproval.myAddedDatePersian | jDate | faNum }}</td>
+
+          <td>{{ myApproval.advertStatusTitle | faNum }}</td>
+
+          <td>{{ myApproval.advertisementDescription | faNum }}</td>
+        </tr>
+      </ng-template>
+      <!-- / table body -->
+    </p-table>
+    <!-- data table -->
+
+    <!-- data list -->
+    <div class="data-list d-block d-lg-none">
+      <ul *ngFor="let myApproval of myApprovalsLst" class="list-group my-1">
+        <!-- نام شرکت -->
+        <li class="list-group-item">
+          <div class="row">
+            <div class="col my-1 text-center">
+              <strong>نام شرکت</strong>
+            </div>
+
+            <div class="col my-1 text-center">
+              {{ myApproval.publisherCompanyName }}
+            </div>
+          </div>
+        </li>
+        <!-- / نام شرکت -->
+
+        <!--  عنوان اطلاعیه -->
+        <li class="list-group-item">
+          <div class="row">
+            <div class="col my-1 text-center">
+              <strong>عنوان اطلاعیه</strong>
+            </div>
+
+            <div class="col my-1 text-center">
+              {{ myApproval.advertisementSubject }}
+            </div>
+          </div>
+        </li>
+        <!-- /  عنوان اطلاعیه -->
+
+        <!-- زمان ارسال -->
+        <li class="list-group-item">
+          <div class="row">
+            <div class="col my-1 text-center">
+              <strong>زمان ارسال</strong>
+            </div>
+
+            <div class="col my-1 text-center">
+              {{ myApproval.sendDatePersian | jDate | faNum }}
+            </div>
+          </div>
+        </li>
+        <!-- / زمان ارسال -->
+
+        <!-- زمان بررسی -->
+        <li class="list-group-item">
+          <div class="row">
+            <div class="col my-1 text-center">
+              <strong>زمان بررسی</strong>
+            </div>
+
+            <div class="col my-1 text-center">
+              {{ myApproval.myCheckedDatePersian | jDate | faNum }}
+            </div>
+          </div>
+        </li>
+        <!-- / زمان بررسی -->
+
+        <!-- زمان دریافت -->
+        <li class="list-group-item">
+          <div class="row">
+            <div class="col my-1 text-center">
+              <strong>زمان دریافت</strong>
+            </div>
+
+            <div class="col my-1 text-center">
+              {{ myApproval.myAddedDatePersian | jDate | faNum }}
+            </div>
+          </div>
+        </li>
+        <!-- / زمان دریافت -->
+
+        <!-- وضعیت -->
+        <li class="list-group-item">
+          <div class="row">
+            <div class="col my-1 text-center">
+              <strong>وضعیت</strong>
+            </div>
+
+            <div class="col my-1 text-center">
+              {{ myApproval.advertStatusTitle | faNum }}
+            </div>
+          </div>
+        </li>
+        <!-- / وضعیت -->
+
+        <!-- توضیحات -->
+        <li class="list-group-item">
+          <div class="row">
+            <div class="col my-1 text-center">
+              <strong>توضیحات</strong>
+            </div>
+
+            <div class="col my-1 text-center">
+              {{ myApproval.advertisementDescription | faNum }}
+            </div>
+          </div>
+        </li>
+        <!-- / توضیحات -->
+      </ul>
+    </div>
+    <!-- / data list -->
+  </p-panel>
+  <!-- </div>
+  </div> -->
+</section>
+<!-- / data table -->
+
+<p-confirmDialog [style]="{ width: '450px' }" [rtl]="true"></p-confirmDialog>

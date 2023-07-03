@@ -1,0 +1,311 @@
+<p-dialog
+  header="انتخاب اطلاعیه برخط"
+  [(visible)]="visible"
+  [modal]="true"
+  [style]="{ width: '70vw', height: '75vh' }"
+  [draggable]="false"
+  [resizable]="false">
+  <marketwatch-mdl-online-advert-lst
+    (Hide)="onHide($event)"></marketwatch-mdl-online-advert-lst>
+</p-dialog>
+
+<!-- pop up messages -->
+<p-toast key="notificationDefinition" position="bottom-left"></p-toast>
+
+<!-- data table -->
+<section class="section">
+  <!-- <div class="card">
+    <div class="card-body"> -->
+  <div class="card-text pt-3"></div>
+  <!-- input group -->
+  <div class="pb-2">
+    <p-panel class="search-panel__secation pb-1" header="تعریف اطلاعیه">
+      <form #formDir="ngForm" [formGroup]="addNewReportForm">
+        <div class="container">
+          <div class="row row-cols-lg-3 row-cols-1 pb-m-1 pb-2">
+            <!-- اطلاعیه برخط -->
+            <div class="col my-1">
+              <label for="advertisementType">اطلاعیه برخط</label>
+              <input
+                id="advertisementType"
+                name="advertisementType"
+                formControlName="advertisementType"
+                pInputText
+                type="text"
+                class="w-90"
+                [class.ng-invalid]="advertisementType?.invalid"
+                [class.ng-dirty]="
+                  (addNewFormSubmitted && advertisementType?.pristine) ||
+                  advertisementType?.dirty ||
+                  advertisementType?.touched
+                " />
+
+              <button class="btn-lookup-list" (click)="onOpenTypesList()">
+                ...
+              </button>
+            </div>
+            <!-- / اطلاعیه برخط -->
+
+            <!-- طول  دوره -->
+            <div class="col my-1">
+              <label for="courseLength">طول دوره</label>
+              <p-dropdown
+                id="courseLength"
+                name="courseLength"
+                formControlName="courseLength"
+                class="col"
+                styleClass="w-100"
+                optionLabel="title"
+                [options]="courseLengths"
+                placeholder="انتخاب کنید"
+                [class.ng-invalid]="courseLength?.invalid"
+                [showClear]="true">
+              </p-dropdown>
+              <div id="courseLength-help">
+                <small
+                  *ngIf="
+                        (addNewFormSubmitted && courseLength?.pristine) || 
+                        (courseLength?.errors?.['required'] && 
+                        (courseLength?.dirty || courseLength?.touched))
+                      "
+                  class="p-error">
+                  لطفا این فیلد را خالی نگذارید
+                </small>
+                <small style="visibility: hidden" class="p-error">
+                  error
+                </small>
+              </div>
+            </div>
+            <!-- / طول  دوره -->
+            <!-- سال مالی منتهی به -->
+            <div class="col my-1">
+              <label for="yearEnding">سال مالی منتهی به</label>
+              <p-persian-calendar
+                id="yearEnding"
+                name="yearEnding"
+                formControlName="yearEnding"
+                styleClass="w-100 "
+                [class.ng-invalid]="yearEnding?.invalid">
+              </p-persian-calendar>
+              <div id="yearEnding-help">
+                <small
+                  *ngIf="
+                        (addNewFormSubmitted && yearEnding?.pristine) || 
+                        (yearEnding?.errors?.['required'] && 
+                        (yearEnding?.dirty || yearEnding?.touched))
+                      "
+                  class="p-error">
+                  لطفا این فیلد را خالی نگذارید
+                </small>
+                <small style="visibility: hidden" class="p-error">
+                  error
+                </small>
+              </div>
+            </div>
+            <!-- / سال مالی منتهی به -->
+          </div>
+
+          <div class="row">
+            <!-- عنوان اطلاعیه -->
+            <div class="col-8">
+              <label for="description">عنوان اطلاعیه</label>
+              <input
+                id="description"
+                name="description"
+                formControlName="description"
+                pInputText
+                type="text"
+                class="w-100"
+                [class.ng-invalid]="description?.invalid" />
+              <div id="description-help">
+                <small
+                  *ngIf="
+                          (addNewFormSubmitted && description?.pristine) || 
+                          (description?.errors?.['required'] && 
+                          (description?.dirty || description?.touched))
+                        "
+                  class="p-error">
+                  لطفا این فیلد را خالی نگذارید
+                </small>
+                <small style="visibility: hidden" class="p-error">
+                  error
+                </small>
+              </div>
+            </div>
+            <!-- / عنوان اطلاعیه -->
+            <!-- حسابرسی شده -->
+            <div class="col-4" style="padding-top: 17px">
+              <label for="audited" class="px-2">
+                <strong> حسابرسی شده </strong>
+              </label>
+              <p-inputSwitch
+                id="audited"
+                name="audited"
+                formControlName="audited"></p-inputSwitch>
+            </div>
+            <!-- / حسابرسی شده -->
+          </div>
+          <div>
+            <p-table
+              #dataTable
+              class="data-table d-none d-lg-block"
+              dataKey="id"
+              [paginator]="true"
+              [rows]="dataTableRows"
+              [rowsPerPageOptions]="[10, 20, 30]"
+              [styleClass]="gridClass"
+              [rowHover]="true"
+              [totalRecords]="totalCount"
+              [value]="onlineAdvertAttachNeeds"
+              [loading]="loading"
+              [tableStyle]="{ 'min-width': '75rem' }">
+              <!-- table header -->
+              <ng-template pTemplate="header">
+                <tr class="data-table__header">
+                  <th>
+                    <strong>عنوان</strong>
+                  </th>
+
+                  <th>
+                    <strong>توضیحات</strong>
+                  </th>
+
+                  <th>
+                    <strong>پسوند</strong>
+                  </th>
+
+                  <th>
+                    <strong> نوع </strong>
+                  </th>
+
+                  <th>
+                    <strong> اجباری بودن </strong>
+                  </th>
+                  <th></th>
+                </tr>
+              </ng-template>
+              <!-- / table header -->
+              <!-- table body -->
+              <ng-template
+                pTemplate="body"
+                let-onlineAdvertismentNeeds
+                let-rowIndex="rowIndex">
+                <tr>
+                  <td>
+                    {{ onlineAdvertismentNeeds.title }}
+                  </td>
+                  <td>{{ onlineAdvertismentNeeds.description }}</td>
+                  <td>{{ onlineAdvertismentNeeds.extention }}</td>
+                  <td>{{ onlineAdvertismentNeeds.type }}</td>
+                  <td>{{ onlineAdvertismentNeeds.isRequired }}</td>
+                  <th>
+                    <p-fileUpload
+                      #form
+                      id="fileUpload_{{
+                        onlineAdvertismentNeeds.onlineAdvertAttachmentNeedsId
+                      }}"
+                      mode="basic"
+                      chooseLabel="افزودن پیوست"
+                      name="attachments[]"
+                      [maxFileSize]="10000000"
+                      [auto]="true"
+                      (onSelect)="
+                        onSelectAttachment(
+                          $event.files,
+                          onlineAdvertismentNeeds,
+                          form
+                        )
+                      "></p-fileUpload>
+
+                    <!-- (onUpload)="
+                            uploadAttachment($event.files)
+                          " -->
+                    <!-- <p-fileUpload
+                          #insuranceAttachmentUploader
+                          name="attachments[]"
+                          class="attachment__fileupload"
+                          chooseLabel="افزودن پیوست"
+                          [multiple]="true"
+                          [showUploadButton]="false"
+                          [showCancelButton]="false"
+                          [maxFileSize]="10000000"
+                          invalidFileSizeMessageSummary="حداکثر حجم مجاز 10mb است"
+                          invalidFileSizeMessageDetail="حجم فابل بیش از حد مجاز است"
+                          (onSelect)="uploadAttachment($event.files)">
+                          <ng-template pTemplate="toolbar">
+                            <div class="py-3">فایل‌های انتخاب شده</div>
+                          </ng-template>
+                        </p-fileUpload> -->
+                  </th>
+                </tr>
+              </ng-template>
+              <!-- / table body -->
+            </p-table>
+          </div>
+
+          <!-- <div class="row row-cols-1 jf-center ai-center pb-m-1 pb-2"> -->
+          <!-- حسابرسی شده -->
+          <!-- <div
+                  class="col d-flex justify-content-start align-items-center my-1">
+                  <label for="audited" class="px-2">
+                    <strong> حسابرسی شده </strong>
+                  </label>
+                  <p-inputSwitch
+                    id="audited"
+                    name="audited"
+                    formControlName="audited"
+                    [class.ng-invalid]="audited?.invalid"
+                    [class.ng-dirty]="
+                      (addNewFormSubmitted && audited?.pristine) ||
+                      audited?.dirty ||
+                      audited?.touched
+                    "></p-inputSwitch>
+                </div> -->
+          <!-- / حسابرسی شده -->
+          <!-- </div> -->
+
+          <!-- <div class="row row-cols-1 jf-center ai-center pb-m-1 pb-2">
+                <p-fileUpload
+                  #insuranceAttachmentUploader
+                  name="attachments[]"
+                  class="attachment__fileupload"
+                  chooseLabel="افزودن پیوست"
+                  [multiple]="true"
+                  [showUploadButton]="false"
+                  [showCancelButton]="false"
+                  [maxFileSize]="10000000"
+                  invalidFileSizeMessageSummary="حداکثر حجم مجاز 10mb است"
+                  invalidFileSizeMessageDetail="حجم فابل بیش از حد مجاز است"
+                  (onSelect)="uploadAttachment($event.files)">
+                  <ng-template pTemplate="toolbar">
+                    <div class="py-3">فایل‌های انتخاب شده</div>
+                  </ng-template>
+                </p-fileUpload>
+              </div> -->
+
+          <!-- دکمه ها -->
+          <div
+            class="d-flex justify-content-center justify-content-md-end pt-3 w-100">
+            <p-button
+              class="pe-2"
+              styleClass="p-button-success"
+              label="تایید"
+              icon="pi pi-check"
+              (onClick)="addNewReport()"></p-button>
+            <p-button
+              class="pe-2"
+              styleClass="p-button-warning"
+              label="انصراف"
+              icon="pi pi-times"
+              (click)="resetAddNewReportForm()"></p-button>
+          </div>
+          <!-- / دکمه ها -->
+        </div>
+      </form>
+    </p-panel>
+  </div>
+  <!-- / input group -->
+  <!-- </div>
+  </div> -->
+</section>
+<!-- / data table -->

@@ -1,0 +1,698 @@
+<!-- pop up messages -->
+<p-toast key="confirmationDefinition" position="bottom-left"></p-toast>
+
+<!-- main content -->
+<section class="section">
+  <!-- <div class="card">
+    <div class="card-body"> -->
+  <div class="card-text pt-3"></div>
+  <!-- جستجو -->
+  <div class="pb-2">
+    <form
+      #formDir="ngForm"
+      [formGroup]="searchReportForm"
+      (ngSubmit)="searchReport()">
+      <p-panel
+        class="search-panel__secation pb-1"
+        header="تایید اطلاعیه"
+        iconPos="start"
+        [toggleable]="true"
+        [collapsed]="true">
+        <div class="form-group container">
+          <div class="row row-cols-lg-2 row-cols-1">
+            <!-- نام شرکت -->
+            <div class="col my-1">
+              <label for="company">نام شرکت</label>
+              <input
+                pInputText
+                id="company"
+                name="company"
+                formControlName="company"
+                type="text"
+                class="w-100" />
+            </div>
+            <!-- / نام شرکت -->
+
+            <!-- عنوان اطلاعیه -->
+            <div class="col my-1">
+              <label for="description">عنوان اطلاعیه</label>
+              <input
+                pInputText
+                id="description"
+                name="description"
+                formControlName="description"
+                type="text"
+                class="w-100" />
+            </div>
+            <!-- / عنوان اطلاعیه -->
+
+            <!-- کد -->
+            <div class="col my-1">
+              <label for="code">کد</label>
+              <input
+                pInputText
+                id="code"
+                name="code"
+                formControlName="code"
+                type="text"
+                class="w-100"
+                [value]="code?.value | faNum" />
+            </div>
+            <!-- / کد -->
+
+            <!-- زمان ارسال -->
+            <div class="col my-1">
+              <label for="sendDate">زمان ارسال</label>
+              <p-persian-calendar
+                id="sendDate"
+                name="sendDate"
+                formControlName="sendDate"
+                styleClass="w-100 ">
+              </p-persian-calendar>
+            </div>
+            <!-- / زمان ارسال -->
+
+            <!-- دکمه -->
+            <div class="d-flex justify-content-end my-1 w-100">
+              <p-button
+                class="pe-2"
+                styleClass="p-button-info w-100"
+                label="جستجو"
+                icon="pi pi-search"
+                type="submit">
+              </p-button>
+            </div>
+            <!-- / دکمه -->
+          </div>
+        </div>
+      </p-panel>
+    </form>
+  </div>
+  <!-- / جستجو -->
+
+  <!-- data table -->
+  <p-table
+    #dataTable
+    dataKey="id"
+    [styleClass]="gridClass"
+    [paginator]="true"
+    [rows]="dataTableRows"
+    [rowsPerPageOptions]="[10, 20, 30]"
+    [rowHover]="true"
+    [totalRecords]="totalCount"
+    [value]="reportList"
+    [loading]="loading"
+    [tableStyle]="{ 'min-width': '75rem' }"
+    [lazy]="true"
+    (onLazyLoad)="getReportList($event)"
+    class="data-table d-none d-lg-block">
+    <!-- table header -->
+    <ng-template pTemplate="header">
+      <tr class="data-table__header">
+        <!-- <th style="min-width: 3rem">
+              <strong>ردیف</strong>
+            </th> -->
+
+        <th>
+          <strong>نام شرکت</strong>
+        </th>
+
+        <th>
+          <strong>عنوان اطلاعیه</strong>
+        </th>
+
+        <th>
+          <strong>کد</strong>
+        </th>
+
+        <th>
+          <strong>زمان ارسال</strong>
+        </th>
+
+        <th>
+          <strong>زمان انتشار</strong>
+        </th>
+
+        <th>
+          <strong>وضعیت اطلاعیه</strong>
+        </th>
+
+        <th>
+          <strong>سطح تایید</strong>
+        </th>
+
+        <th>
+          <strong>جزئیات</strong>
+        </th>
+
+        <th>
+          <strong>پیوست‌ها</strong>
+        </th>
+
+        <th>
+          <strong>تعیین وضعیت</strong>
+        </th>
+      </tr>
+    </ng-template>
+    <!-- / table header -->
+    <!-- table body -->
+    <ng-template pTemplate="body" let-report let-rowIndex="rowIndex">
+      <tr class="data-table__body">
+        <!-- <td>
+              <strong style="font-size: 17px">
+                {{ rowIndex + 1 | faNum }}
+              </strong>
+            </td> -->
+
+        <td>{{ report.company | faNum }}</td>
+
+        <td>{{ report.description | faNum }}</td>
+
+        <td>{{ report.code | faNum }}</td>
+
+        <td>{{ report.sendDate | jDate | faNum }}</td>
+
+        <td>{{ report.publishDate | jDate | faNum }}</td>
+
+        <td>{{ report.advertStatus ? 'تایید شده' : 'تایید نشده' }}</td>
+
+        <td>{{ report.stateOrder | faNum }}</td>
+
+        <td>
+          <p-button
+            styleClass="p-button-text p-button-rounded p-button-lg"
+            icon="pi pi-eye"
+            (click)="previewDetails(report)"></p-button>
+        </td>
+
+        <td>
+          <p-button
+            styleClass="p-button-text p-button-rounded p-button-lg"
+            icon="pi pi-paperclip"
+            (click)="previewAttachments(report.id)"></p-button>
+        </td>
+
+        <td>
+          <p-button
+            styleClass="p-button-text p-button-rounded p-button-lg"
+            icon="pi pi-pencil"
+            (click)="previewConfirmation(report)"></p-button>
+        </td>
+      </tr>
+    </ng-template>
+    <!-- / table body -->
+  </p-table>
+  <!-- data table -->
+
+  <!-- data list -->
+  <div class="data-list d-block d-lg-none">
+    <ul *ngFor="let report of reportList" class="list-group my-1">
+      <!-- نام شرکت -->
+      <li class="list-group-item">
+        <div class="row">
+          <div class="col my-1 text-center">
+            <strong>نام شرکت</strong>
+          </div>
+
+          <div class="col my-1 text-center">
+            {{ report.company | faNum }}
+          </div>
+        </div>
+      </li>
+      <!-- / نام شرکت -->
+
+      <!-- اخطار -->
+      <li class="list-group-item">
+        <div class="row">
+          <div class="col my-1 text-center">
+            <i class="mgc_emergency_flashers_fill list-group-item__warning">
+            </i>
+          </div>
+
+          <div class="col my-1 text-center">
+            {{ report.comment }}
+          </div>
+        </div>
+      </li>
+      <!-- / اخطار -->
+
+      <!-- عنوان اطلاعیه -->
+      <li class="list-group-item">
+        <div class="row">
+          <div class="col my-1 text-center">
+            <strong>عنوان اطلاعیه</strong>
+          </div>
+
+          <div class="col my-1 text-center">
+            {{ report.description | faNum }}
+          </div>
+        </div>
+      </li>
+      <!-- / عنوان اطلاعیه -->
+
+      <!-- کد -->
+      <li class="list-group-item">
+        <div class="row">
+          <div class="col my-1 text-center">
+            <strong>کد</strong>
+          </div>
+
+          <div class="col my-1 text-center">
+            {{ report.code | faNum }}
+          </div>
+        </div>
+      </li>
+      <!-- / کد -->
+
+      <!-- زمان ارسال -->
+      <li class="list-group-item">
+        <div class="row">
+          <div class="col my-1 text-center">
+            <strong>زمان ارسال</strong>
+          </div>
+
+          <div class="col my-1 text-center">
+            {{ report.sendDate | jDate | faNum }}
+          </div>
+        </div>
+      </li>
+      <!-- / زمان ارسال -->
+
+      <!-- زمان انتشار -->
+      <li class="list-group-item">
+        <div class="row">
+          <div class="col my-1 text-center">
+            <strong>زمان انتشار</strong>
+          </div>
+
+          <div class="col my-1 text-center">
+            {{ report.publishDate | jDate | faNum }}
+          </div>
+        </div>
+      </li>
+      <!-- / زمان انتشار -->
+
+      <!-- وضعیت اطلاعیه -->
+      <li class="list-group-item">
+        <div class="row">
+          <div class="col my-1 text-center">
+            <strong>وضعیت اطلاعیه</strong>
+          </div>
+
+          <div class="col my-1 text-center">
+            {{ report.advertStatus ? 'تایید شده' : 'تایید نشده' }}
+          </div>
+        </div>
+      </li>
+      <!-- / وضعیت اطلاعیه -->
+
+      <!-- سطح تایید -->
+      <li class="list-group-item">
+        <div class="row">
+          <div class="col my-1 text-center">
+            <strong>سطح تایید</strong>
+          </div>
+
+          <div class="col my-1 text-center">
+            {{ report.stateOrder }}
+          </div>
+        </div>
+      </li>
+      <!-- / سطح تایید -->
+
+      <!-- جزئیات -->
+      <li class="list-group-item">
+        <div class="row">
+          <div class="col my-1 text-center">
+            <strong>جزئیات</strong>
+          </div>
+
+          <div class="col my-1 text-center">
+            <p-button
+              class="pe-2"
+              styleClass="p-button-text p-button-rounded p-button-lg"
+              icon="pi pi-eye"
+              (click)="previewDetails(report)"></p-button>
+          </div>
+        </div>
+      </li>
+      <!-- / جزئیات -->
+
+      <!-- پیوست‌ها -->
+      <li class="list-group-item">
+        <div class="row">
+          <div class="col my-1 text-center">
+            <strong>پیوست‌ها</strong>
+          </div>
+
+          <div class="col my-1 text-center">
+            <p-button
+              class="pe-2"
+              styleClass="p-button-text p-button-rounded"
+              icon="pi pi-file"
+              (click)="previewAttachments(report.id)"></p-button>
+          </div>
+        </div>
+      </li>
+      <!-- / پیوست‌ها -->
+
+      <!-- تعیین وضعیت -->
+      <li class="list-group-item">
+        <div class="row">
+          <div class="col my-1 text-center">
+            <strong>تعیین وضعیت</strong>
+          </div>
+
+          <div class="col my-1 text-center">
+            <p-button
+              class="pe-2"
+              styleClass="p-button-text p-button-rounded"
+              icon="pi pi-pencil"
+              (click)="previewConfirmation(report)"></p-button>
+          </div>
+        </div>
+      </li>
+      <!-- / پیوست‌ها -->
+    </ul>
+  </div>
+  <!-- / data list -->
+  <!-- </div>
+  </div> -->
+</section>
+<!-- / main content -->
+
+<!-- preview report detail -->
+<p-dialog
+  styleClass="p-fluid"
+  header="جزئیات"
+  [style]="{ width: '640px', height: '420px' }"
+  [modal]="true"
+  [(visible)]="previewDetailsDialog">
+  <!-- dialog content -->
+  <ng-template pTemplate="content">
+    <div class="data-table-detail__content-info">
+      <!-- data list -->
+      <div class="data-list">
+        <ul class="list-group my-1">
+          <!-- کد -->
+          <li class="list-group-item">
+            <div class="row">
+              <div class="col my-1">
+                <strong>کد</strong>
+              </div>
+
+              <div class="col my-1 text-center">
+                {{ selectedReport.code | faNum }}
+              </div>
+            </div>
+          </li>
+          <!-- / کد -->
+
+          <!-- گروه اطلاعیه -->
+          <li class="list-group-item">
+            <div class="row">
+              <div class="col my-1">
+                <strong>گروه اطلاعیه</strong>
+              </div>
+
+              <div class="col my-1 text-center">
+                {{ selectedReport.advertisementGroup }}
+              </div>
+            </div>
+          </li>
+          <!-- / گروه اطلاعیه -->
+
+          <!-- نوع اطلاعیه -->
+          <li class="list-group-item">
+            <div class="row">
+              <div class="col my-1">
+                <strong>نوع اطلاعیه</strong>
+              </div>
+
+              <div class="col my-1 text-center">
+                {{ selectedReport.parentAdvertId ? 'تلفیقی' : 'اصلی' }}
+              </div>
+            </div>
+          </li>
+          <!-- / نوع اطلاعیه -->
+
+          <!-- موضوع اطلاعیه -->
+          <li class="list-group-item">
+            <div class="row">
+              <div class="col my-1">
+                <strong>موضوع اطلاعیه</strong>
+              </div>
+
+              <div class="col my-1 text-center">
+                {{ selectedReport.subject }}
+              </div>
+            </div>
+          </li>
+          <!-- / موضوع اطلاعیه -->
+
+          <!-- سال منتهی به -->
+          <li class="list-group-item">
+            <div class="row">
+              <div class="col my-1">
+                <strong>سال منتهی به</strong>
+              </div>
+
+              <div class="col my-1 text-center">
+                {{ selectedReport.yearEnding | jDate | faNum }}
+              </div>
+            </div>
+          </li>
+          <!-- / سال منتهی به -->
+
+          <!-- موسسه حسابرسی شرکت -->
+          <li class="list-group-item">
+            <div class="row">
+              <div class="col my-1">
+                <strong>موسسه حسابرسی شرکت</strong>
+              </div>
+
+              <div class="col my-1 text-center">
+                {{ selectedReport.companyInspectionInstitute }}
+              </div>
+            </div>
+          </li>
+          <!-- / موسسه حسابرسی شرکت -->
+
+          <!-- حسابرسی شده -->
+          <li class="list-group-item">
+            <div class="row">
+              <div class="col my-1">
+                <strong>حسابرسی شده</strong>
+              </div>
+
+              <div class="col my-1 text-center">
+                {{ selectedReport.audited ? 'بلی' : 'خیر' }}
+              </div>
+            </div>
+          </li>
+          <!-- / حسابرسی شده -->
+        </ul>
+      </div>
+      <!-- / data list -->
+    </div>
+  </ng-template>
+  <!-- / dialog content -->
+</p-dialog>
+<!-- / preview report detail -->
+
+<!-- preview attachments dialog -->
+<p-dialog
+  class="data-table-detail"
+  styleClass="p-fluid"
+  header="پیوست‌ها"
+  [style]="{ width: '800px', height: '500px' }"
+  [modal]="true"
+  [(visible)]="previewAttachmentsDialog">
+  <!-- dialog content -->
+  <ng-template pTemplate="content">
+    <!-- header -->
+    <ul class="list-group my-1">
+      <li class="list-group-item bg-light">
+        <div class="row">
+          <div class="col my-1 text-center">
+            <strong>نمایه</strong>
+          </div>
+          <div class="col my-1 text-center">
+            <strong>نام</strong>
+          </div>
+          <div class="col my-1 text-center">
+            <strong>حجم</strong>
+          </div>
+          <div class="col my-1 text-center">
+            <strong>دریافت</strong>
+          </div>
+        </div>
+      </li>
+    </ul>
+    <!-- / header -->
+
+    <!-- body -->
+    <ul
+      *ngFor="let attachment of reportAttachment.attachments"
+      class="list-group my-1">
+      <!-- نمایه -->
+      <li class="list-group-item">
+        <div class="row d-flex jc-center ai-center">
+          <div class="col my-1 text-center">
+            <i
+              class="mgc_file_fill fs-2"
+              [class.mgc_pic_2_fill]="attachment.type === attachmentType.IMAGE"
+              [class.mgc_video_fill]="attachment.type === attachmentType.VIDEO"
+              [class.mgc_pdf_fill]="attachment.type === attachmentType.PDF"
+              [class.mgc_doc_fill]="attachment.type === attachmentType.WORD"
+              [class.mgc_xls_fill]="
+                attachment.type === attachmentType.EXCEL
+              "></i>
+          </div>
+          <!-- / نمایه -->
+
+          <!-- نام فایل -->
+          <div class="col my-1 text-center" style="direction: ltr">
+            <small> {{ attachment.fileName }}</small>
+          </div>
+          <!-- / نام فایل -->
+
+          <!-- اندازه فایل -->
+          <div class="col my-1 text-center" style="direction: ltr">
+            <small> {{ attachment.size | faNum }}</small>
+          </div>
+          <!-- / اندازه فایل -->
+
+          <!-- اندازه فایل -->
+          <div class="col my-1 text-center">
+            <p-button
+              class="pe-2"
+              styleClass="p-button-text p-button-rounded p-button-lg"
+              icon="pi pi-download"
+              (click)="downloadAttachmnet(attachment)"></p-button>
+          </div>
+          <!-- / اندازه فایل -->
+        </div>
+      </li>
+    </ul>
+    <!-- / body -->
+  </ng-template>
+  <!-- / dialog content -->
+</p-dialog>
+<!-- / preview attachments dialog -->
+
+<!-- confirmation dialog -->
+<p-dialog
+  class="data-table-detail"
+  styleClass="p-fluid"
+  header="تعیین وضعیت"
+  [style]="{ width: '450px', height: '360px' }"
+  [modal]="true"
+  [(visible)]="previewConfirmationDialog">
+  <!-- dialog content -->
+  <ng-template pTemplate="content">
+    <div class="data-table-detail__content-info">
+      <!-- actionType -->
+      <div class="align-items-center justify-content-around my-1 w-50">
+        <div class="align-items-center">
+          <p-radioButton
+            inputId="ingredient1"
+            name="accept"
+            [value]="'APPROVE'"
+            [(ngModel)]="actionType"
+            class="radio-btns"></p-radioButton>
+          <label for="ingredient1" class="ms-2">مورد قبول می باشد.</label>
+        </div>
+
+        <div class="align-items-center">
+          <p-radioButton
+            inputId="ingredient2"
+            name="reject"
+            [value]="'REJECT'"
+            [(ngModel)]="actionType"
+            class="radio-btns"></p-radioButton>
+          <label for="ingredient2" class="ms-2">مورد قبول نمی باشد.</label>
+        </div>
+
+        <div class="align-items-center">
+          <p-radioButton
+            inputId="ingredient2"
+            name="reffer"
+            [value]="'REFFER'"
+            [(ngModel)]="actionType"
+            class="radio-btns"></p-radioButton>
+          <label for="ingredient2" class="ms-2"
+            >رد کامل ( بازگشت به ناشر )</label
+          >
+        </div>
+      </div>
+      <!-- / actionType -->
+
+      <!-- rejection reason -->
+      <form #formDir="ngForm" [formGroup]="rejectReportForm">
+        <div class="form-group">
+          <div class="pt-3">
+            <textarea
+              pInputTextarea
+              id="reason"
+              name="reason"
+              formControlName="reason"
+              rows="5"
+              cols="30"
+              class="w-100"
+              placeholder="توضیحات"
+              [autoResize]="true"
+              [class.ng-invalid]="reason?.invalid"
+              [class.ng-dirty]="
+                (rejectReportFormSubmitted && reason?.pristine) ||
+                reason?.dirty ||
+                reason?.touched
+              "></textarea>
+
+            <div id="reason-help">
+              <small
+                *ngIf="
+                  (rejectReportFormSubmitted && reason?.pristine) || 
+                  (reason?.errors?.['required'] && 
+                  (reason?.dirty || reason?.touched))
+                "
+                class="p-error">
+                لطفا این فیلد را خالی نگذارید
+              </small>
+              <small style="visibility: hidden" class="p-error"> error </small>
+            </div>
+          </div>
+        </div>
+      </form>
+      <!-- / rejection reason -->
+    </div>
+  </ng-template>
+  <!-- / dialog content -->
+
+  <!-- dialog footer -->
+  <ng-template pTemplate="footer">
+    <div class="d-flex justify-content-between align-items-center w-100">
+      <div class="d-flex justify-content-end align-items-center w-100">
+        <p-button
+          class="operation__reject"
+          styleClass="p-button-success"
+          icon="pi pi-check"
+          iconPos="left"
+          label="ثبت"
+          (click)="confirmReport()">
+        </p-button>
+
+        <p-button
+          class="operation__reject"
+          styleClass="p-button-warning"
+          icon="pi pi-times"
+          iconPos="left"
+          label="انصراف"
+          (click)="closeConfirmationDialog()">
+        </p-button>
+      </div>
+    </div>
+  </ng-template>
+  <!-- / dialog footer -->
+</p-dialog>
+<!-- / confirmation dialog -->
